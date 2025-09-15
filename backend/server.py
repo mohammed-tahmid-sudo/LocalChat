@@ -1,47 +1,24 @@
-import socket
+import asyncio
 import threading
 
-# ----- Server part (listen for incoming messages) -----
-def server(port):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("0.0.0.0", port))   # listen on all interfaces
-    s.listen(1)
-    print(f"[Server] Listening on port {port}...")
-
+async def receive_messages(reader):
     while True:
-        conn, addr = s.accept()
-        data = conn.recv(1024).decode()
+        data = await reader.read(1024)
         if not data:
+            print("Connection closed")
             break
-        print(f"\n[{addr[0]}] {data}")
-        conn.close()
+        print(f"\nReceived: {data.decode()}")
 
-# ----- Client part (send messages to target IP/port) -----
-def client():
+def send_messages(writer, name):
     while True:
-        try:
-            target = input("Enter target IP:Port (or 'quit'): ")
-            if target.lower() == "quit":
-                break
-            ip, port = target.split(":")
-            port = int(port)
+        msg = input(f"{name}: ")
+        writer.write(msg.encode())
+        asyncio.run_coroutine_threadsafe(writer.drain(), asyncio.get_event_loop())
 
-            msg = input("Message: ")
+async def main(name):
+    reader, writer = await asyncio.open_connection('127.0.0.1', 5000)
+    threading.Thread(target=send_messages, args=(writer, name), daemon=True).start()
+    await receive_messages(reader)
 
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((ip, port))
-            s.send(msg.encode())
-            s.close()
-        except Exception as e:
-            print("Error:", e)
-
-# ----- Main -----
-if __name__ == "__main__":
-    my_port = int(input("Enter your listening port: "))
-
-    # start server thread
-    threading.Thread(target=server, args=(my_port,), daemon=True).start()
-
-    # run client loop
-    client()
+asyncio.run(main("Client1"))
 
