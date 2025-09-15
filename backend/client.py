@@ -1,19 +1,10 @@
 import socket
 
-# Create a socket
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s = socket.socket()
+s.connect(("127.0.0.1", 5000))
 
-# Connect to server
-client.connect(('127.0.0.1', 12345))
-
-# Send data
-for _ in range(1, 1000): 
-        client.send(b"Hello from client!\n")
-
-# Receive response
-data = client.recv(1024)
-print("Received:", data.decode())
-
-# Close connection
-client.close()
+while True:
+    msg = input("You: ")
+    s.sendall(msg.encode())
+    print("Friend:", s.recv(1024).decode())
 
