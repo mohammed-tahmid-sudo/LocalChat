@@ -1,24 +1,40 @@
-import asyncio
-import threading
+import socket
 
-async def receive_messages(reader):
-    while True:
-        data = await reader.read(1024)
-        if not data:
-            print("Connection closed")
-            break
-        print(f"\nReceived: {data.decode()}")
+soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-def send_messages(writer, name):
-    while True:
-        msg = input(f"{name}: ")
-        writer.write(msg.encode())
-        asyncio.run_coroutine_threadsafe(writer.drain(), asyncio.get_event_loop())
+print("socket Created succesfully")
 
-async def main(name):
-    reader, writer = await asyncio.open_connection('127.0.0.1', 5000)
-    threading.Thread(target=send_messages, args=(writer, name), daemon=True).start()
-    await receive_messages(reader)
+soc.bind(("0.0.0.0", 12345))
 
-asyncio.run(main("Client1"))
+print("socket binded!")
 
+soc.listen(2)
+
+print("listning")
+
+client1, addr1 = soc.accept()
+
+print("connected the first client")
+
+client2, addr2 = soc.accept()
+
+print("connected the second client")
+
+while True:
+
+    msg1 = client1.recv(1024)
+    msg2 = client2.recv(1024)
+
+    client2.send(msg1)
+    client1.send(msg2)
+
+
+    # client2.send(msg1)
+    #
+    # msg2 = client2.recv(1024)
+    # # if not msg2:
+    # #     break
+    # client1.send(msg2)
+    #
+    #
+    #

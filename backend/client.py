@@ -1,6 +1,12 @@
 import socket
 
-soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client = socket.socket()
+client.connect(("127.0.0.1", 12345))
 
-print("socket Created succesfully")
+while True:
+    msg = input("You: ")
+    client.send(msg.encode())
+
+    data = client.recv(1024)
+    print("Other:", data.decode())
 
