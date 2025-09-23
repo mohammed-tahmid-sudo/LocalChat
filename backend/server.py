@@ -1,3 +1,7 @@
-import sqlite3
 import socket
-import threading
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+
+s.bind(("0.0.0.0", 12345))
+
+

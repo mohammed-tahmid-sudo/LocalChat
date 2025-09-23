@@ -1,23 +1,30 @@
 import socket
-import json
-from datetime import datetime, timezone
+import threading
 
-ts = datetime.now(timezone.utc).isoformat(timespec='seconds')
+def receive(sock):
+    while True:
+        try:
+            data = sock.recv(1024).decode()
+            if not data:
+                break
+            print("\n[Server]:", data)
+        except:
+            break
 
-# connect to server
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(("127.0.0.0", 12345))  # replace with server IP
+def main():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect(("127.0.0.1", 5000))
 
-while True:
-    # example data to send
-    data = {
-        # "action": input("ENTER YOUR MESSAGE: "),
-        "id": "123456789",
-        "sender": input("NAME: "),
-        "content": input("content: "),
-        "timestamp": ts
-    }
+    threading.Thread(target=receive, args=(sock,), daemon=True).start()
 
-    # convert dict to JSON string and encode to bytes
-    client.sendall(json.dumps(data).encode())
-    print("Data sent to server.")
+    while True:
+        msg = input()
+        if msg.lower() == "quit":
+            break
+        sock.sendall(msg.encode())
+
+    sock.close()
+
+if __name__ == "__main__":
+    main()
+
