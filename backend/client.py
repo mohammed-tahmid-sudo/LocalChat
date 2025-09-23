@@ -4,27 +4,19 @@ import threading
 def receive(sock):
     while True:
         try:
-            data = sock.recv(1024).decode()
-            if not data:
+            msg = sock.recv(1024).decode()
+            if not msg:
                 break
-            print("\n[Server]:", data)
+            print("Friend:", msg)
         except:
             break
 
-def main():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect(("127.0.0.1", 5000))
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect(("127.0.0.1", 12345))
 
-    threading.Thread(target=receive, args=(sock,), daemon=True).start()
+threading.Thread(target=receive, args=(sock,), daemon=True).start()
 
-    while True:
-        msg = input()
-        if msg.lower() == "quit":
-            break
-        sock.sendall(msg.encode())
-
-    sock.close()
-
-if __name__ == "__main__":
-    main()
+while True:
+    msg = input("You: ")
+    sock.send(msg.encode())
 
