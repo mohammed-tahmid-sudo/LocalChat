@@ -1,37 +1,42 @@
 import socket
 import threading
+import time
+
+HOST = "0.0.0.0"
+PORT = 12345
+
 
 def handle_client(conn, addr):
-    print(f"[NEW CONNECTION] {addr} connected.")
-    while True:
-        try:
-            msg = conn.recv(1024).decode()
-            if not msg:
+    try:
+        while True:
+            data = conn.recv(1024)
+            if not data:
                 break
-            print(f"[{addr}] {msg}")
-            broadcast(msg, conn)
-        except:
-            break
-    conn.close()
+            conn.sendall(b"ACK\n")
+    except:
+        pass
+    finally:
+        conn.close()
 
-def broadcast(message, sender_conn):
-    for c in clients:
-        if c != sender_conn:
-            try:
-                c.send(message.encode())
-            except:
-                pass
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(("0.0.0.0", 12345))
-server.listen()
+def start_server():
+    while True:  # restart server if it crashes
+        try:
+            server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            server.bind((HOST, PORT))
+            server.listen(1000)
+            print(f"Listening on {HOST}:{PORT}")
+            while True:
+                conn, addr = server.accept()
+                # the main work goes here
 
-clients = []
-print("[SERVER STARTED] Waiting for connections...")
+                text = conn.recv(2**12)
+                print(text)
 
-while True:
-    conn, addr = server.accept()
-    clients.append(conn)
-    thread = threading.Thread(target=handle_client, args=(conn, addr))
-    thread.start()
+                threading.Thread(target=handle_client, args=(conn, addr)).start()
+        except Exception as e:
+            print("Server crashed, restarting in 3 seconds:", e)
+            time.sleep(3)
 
+
+start_server()

@@ -1,22 +1,26 @@
 import socket
 import threading
 
-def receive(sock):
-    while True:
-        try:
-            msg = sock.recv(1024).decode()
-            if not msg:
-                break
-            print("Friend:", msg)
-        except:
-            break
+HOST = '127.0.0.1'
+PORT = 12345
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.connect(("127.0.0.1", 12345))
+def client():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((HOST, PORT))
+        print("sending hello world") 
+        s.sendall(b'Hello server!\n')
+        print(s.recv(1024).decode())
+        s.close()
+    except Exception as e:
+        print("Error:", e)
 
-threading.Thread(target=receive, args=(sock,), daemon=True).start()
+threads = []
+for _ in range(1000):
+    t = threading.Thread(target=client)
+    t.start()
+    threads.append(t)
 
-while True:
-    msg = input("You: ")
-    sock.send(msg.encode())
+for t in threads:
+    t.join()
 
