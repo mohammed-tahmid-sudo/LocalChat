@@ -22,18 +22,18 @@ database.close()
 def handle_client(conn, addr):
     try:
         while True:
-            data = conn.recv(1024)
-            if not data:
-                break
 
+            # print(f"connected with {addr}")
             text = conn.recv(2**12)
-
+            if not text:
+                break
             try:
                 text_json = json.loads(text)
+                print(text_json) 
             except:
                 print("unable to load the json file. Maybe because it's not a json")
     except:
-        pass
+        print("SOME ERROR OCCURED")
     finally:
         conn.close()
 
@@ -47,19 +47,11 @@ def start_server():
             print(f"Listening on {HOST}:{PORT}")
             while True:
                 conn, addr = server.accept()
-                # the main work goes here
-                print(f"connected with {addr}")
-                print("performing operations")
-                # text = conn.recv(2**12)
-
-                # try:
-                #     text_json = json.loads(text)
-                # except:
-                #     print("unable to load the json file. Maybe because it's not a json")
+            
 
                 threading.Thread(target=handle_client, args=(conn, addr)).start()
         except Exception as e:
-            print("Server crashed, restarting in 3 seconds:", e)
+            print("Server crashed, restarting in a seconds:", e)
             time.sleep(3)
 
 
