@@ -11,7 +11,7 @@ database = sqlite3.connect("/home/tahmid/LocalChat/backend/data/usernames.db")
 db = database.cursor()
 
 db.execute(
-    """ CREATE TABLE IF NOT EXISTS users ( id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE)
+    """ CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT, last_seen STRING REAL)
 """
 )
 
@@ -29,6 +29,11 @@ def handle_client(conn, addr):
                 break
             try:
                 text_json = json.loads(text)
+                if data["Create_User"]:
+                    print("could not find")
+                else: 
+                    print("something else happened") 
+
 
             except:
                 print("unable to load the json file. Maybe because it's not a json")
@@ -47,11 +52,10 @@ def start_server():
             print(f"Listening on {HOST}:{PORT}")
             while True:
                 conn, addr = server.accept()
-            
 
                 threading.Thread(target=handle_client, args=(conn, addr)).start()
         except Exception as e:
-            print("Server crashed, restarting in a seconds:", e)
+            print("Server crashed, restarting in 3 seconds:", e)
             time.sleep(3)
 
 
