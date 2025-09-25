@@ -1,9 +1,22 @@
 import socket
+import json
+import sqlite3
 import threading
 import time
 
 HOST = "0.0.0.0"
 PORT = 12345
+
+database = sqlite3.connect("/home/tahmid/LocalChat/backend/data/usernames.db")
+db = database.cursor()
+
+db.execute(
+    """ CREATE TABLE IF NOT EXISTS users ( id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE)
+"""
+)
+
+database.commit()
+database.close()
 
 
 def handle_client(conn, addr):
@@ -12,7 +25,13 @@ def handle_client(conn, addr):
             data = conn.recv(1024)
             if not data:
                 break
-            conn.sendall(b"ACK\n")
+
+            text = conn.recv(2**12)
+
+            try:
+                text_json = json.loads(text)
+            except:
+                print("unable to load the json file. Maybe because it's not a json")
     except:
         pass
     finally:
@@ -29,10 +48,14 @@ def start_server():
             while True:
                 conn, addr = server.accept()
                 # the main work goes here
-                print(f"connected with {addr}")  
+                print(f"connected with {addr}")
+                print("performing operations")
+                # text = conn.recv(2**12)
 
-                text = conn.recv(2**12)
-                print(text)
+                # try:
+                #     text_json = json.loads(text)
+                # except:
+                #     print("unable to load the json file. Maybe because it's not a json")
 
                 threading.Thread(target=handle_client, args=(conn, addr)).start()
         except Exception as e:
