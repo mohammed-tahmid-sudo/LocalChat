@@ -29,12 +29,12 @@ def handle_client(conn, addr):
                 break
             try:
                 text_json = json.loads(text)
-                if data["Create_User"]:
-                    print("could not find")
+                user_info = text_json.get("Create_User")
+                if user_info:
+                    print(user_info)
                 else: 
                     print("something else happened") 
 
-                print(text_json)
 
 
             except:
