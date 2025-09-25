@@ -29,7 +29,7 @@ def handle_client(conn, addr):
                 break
             try:
                 text_json = json.loads(text)
-                print(text_json) 
+
             except:
                 print("unable to load the json file. Maybe because it's not a json")
     except:
