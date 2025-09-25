@@ -24,10 +24,6 @@ def client():
 
         data = {"Create_User": {"NAME": "BAKA/Dummy", "ID": password1}}
 
-        if data["Create_User"]:
-            print(0) 
-        else: 
-            print("something else happened") 
 
         s.sendall(json.dumps(data).encode())
         print(s.recv(1024).decode())

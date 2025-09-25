@@ -34,6 +34,8 @@ def handle_client(conn, addr):
                 else: 
                     print("something else happened") 
 
+                print(text_json)
+
 
             except:
                 print("unable to load the json file. Maybe because it's not a json")
