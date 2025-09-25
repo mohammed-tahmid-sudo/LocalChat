@@ -29,6 +29,7 @@ def start_server():
             while True:
                 conn, addr = server.accept()
                 # the main work goes here
+                print(f"connected with {addr}")  
 
                 text = conn.recv(2**12)
                 print(text)
