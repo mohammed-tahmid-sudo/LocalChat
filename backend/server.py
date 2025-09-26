@@ -1,3 +1,4 @@
+from os import EX_CANTCREAT
 import socket
 import json
 import sqlite3
@@ -14,7 +15,6 @@ db.execute(
     """ CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT, last_seen STRING REAL)
 """
 )
-
 database.commit()
 database.close()
 
@@ -22,6 +22,11 @@ database.close()
 def handle_client(conn, addr):
     try:
         while True:
+            database = sqlite3.connect(
+                "/home/tahmid/LocalChat/backend/data/usernames.db",
+                check_same_thread=False,  # allows usage in multiple threads if needed
+            )
+            db = database.cursor()
 
             # print(f"connected with {addr}")
             text = conn.recv(2**12)
@@ -30,15 +35,19 @@ def handle_client(conn, addr):
             try:
                 text_json = json.loads(text)
                 user_info = text_json.get("Create_User")
+                print(user_info)
                 if user_info:
-                    print(user_info)
-                else: 
-                    print("something else happened") 
+                    print("USER INFO. CHECK")
+                    db.execute(
+                        """INSERT INTO users (username) VALUES (?)""",
+                        (user_info["NAME"],),
+                    )
 
+                else:
+                    print("left this part for the next thing")
 
-
-            except:
-                print("unable to load the json file. Maybe because it's not a json")
+            except Exception as e:
+                print("ERROR!!!! CODE:", e)
     except:
         print("SOME ERROR OCCURED")
     finally:
@@ -49,6 +58,7 @@ def start_server():
     while True:  # restart server if it crashes
         try:
             server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # <-- add this
             server.bind((HOST, PORT))
             server.listen(1000)
             print(f"Listening on {HOST}:{PORT}")

@@ -22,7 +22,7 @@ def client():
 
         print("sending a dummy json")
 
-        data = {"Create_User": {"NAME": "BAKA/Dummy", "ID": password1}}
+        data = {"Create_User": {"NAME": "BAKA/Dummy"}}
 
 
         s.sendall(json.dumps(data).encode())
