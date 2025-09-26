@@ -27,13 +27,7 @@ def handle_client(conn, addr):
 
     try:
         while True:
-            # database = sqlite3.connect(
-            #     "/home/tahmid/LocalChat/backend/data/usernames.db",
-            #     check_same_thread=False,  # allows usage in multiple threads if needed
-            # )
-            # db = database.cursor()
-            #
-            # # print(f"connected with {addr}")
+
             text = conn.recv(2**12)
             if not text:
                 break
