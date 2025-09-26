@@ -16,20 +16,19 @@ def random_password(length=16):
 def client():
     password1 = random_password()
     password2 = random_password()
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((HOST, PORT))
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((HOST, PORT))
 
-        print("sending a dummy json")
+    print("sending a dummy json")
 
-        data = {"Create_User": {"NAME": "BAKA/Dummy"}}
+    data = {"Create_User": {"NAME": "BAKA/Dummy"}}
 
 
-        s.sendall(json.dumps(data).encode())
-        print(s.recv(1024).decode())
+    s.sendall(json.dumps(data).encode())
+    # print(s.recv(1024).decode())
 
-        s.close()
-    except Exception as e:
-        print("Error:", e)
+    s.close()
 
-client()
+for x in range(0, 100):
+    client()
+

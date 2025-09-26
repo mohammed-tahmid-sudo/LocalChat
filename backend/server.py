@@ -1,4 +1,3 @@
-from os import EX_CANTCREAT
 import socket
 import json
 import sqlite3
@@ -20,15 +19,21 @@ database.close()
 
 
 def handle_client(conn, addr):
+    database = sqlite3.connect(
+        "/home/tahmid/LocalChat/backend/data/usernames.db",
+        check_same_thread=False,  # allows usage in multiple threads if needed
+    )
+    db = database.cursor()
+
     try:
         while True:
-            database = sqlite3.connect(
-                "/home/tahmid/LocalChat/backend/data/usernames.db",
-                check_same_thread=False,  # allows usage in multiple threads if needed
-            )
-            db = database.cursor()
-
-            # print(f"connected with {addr}")
+            # database = sqlite3.connect(
+            #     "/home/tahmid/LocalChat/backend/data/usernames.db",
+            #     check_same_thread=False,  # allows usage in multiple threads if needed
+            # )
+            # db = database.cursor()
+            #
+            # # print(f"connected with {addr}")
             text = conn.recv(2**12)
             if not text:
                 break
@@ -42,6 +47,7 @@ def handle_client(conn, addr):
                         """INSERT INTO users (username) VALUES (?)""",
                         (user_info["NAME"],),
                     )
+                    database.commit()
 
                 else:
                     print("left this part for the next thing")
