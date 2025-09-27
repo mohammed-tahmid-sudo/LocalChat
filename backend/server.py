@@ -1,4 +1,5 @@
 import socket
+import datetime
 import json
 import sqlite3
 import threading
@@ -7,15 +8,32 @@ import time
 HOST = "0.0.0.0"
 PORT = 12345
 
-database = sqlite3.connect("/home/tahmid/LocalChat/backend/data/usernames.db")
-db = database.cursor()
+CURRENT_TIME = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-db.execute(
+users = sqlite3.connect("/home/tahmid/LocalChat/backend/data/usernames.db")
+ucur = users.cursor()
+
+ucur.execute(
     """ CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT, last_seen STRING REAL)
 """
 )
-database.commit()
-database.close()
+
+holder = sqlite3.connect("/home/tahmid/LocalChat/backend/data/holder.db")
+
+hcur = holder.cursor()
+
+hcur.execute(
+    """
+CREATE TABLE IF NOT EXISTS holder (sender_id TEXT, reciver_id TEXt, msg TEXT) 
+    """
+)
+
+
+users.commit()
+users.close()
+
+holder.commit()
+holder.commit()
 
 
 def handle_client(conn, addr):
@@ -33,21 +51,22 @@ def handle_client(conn, addr):
                 break
             try:
                 text_json = json.loads(text)
-                user_info = text_json.get("Create_User")
-                print(user_info)
-                if user_info:
-                    print("USER INFO. CHECK")
+                if "CREATE_USER" in text_json:
+                    user_info = text_json["CREATE_USER"]
+                    print(user_info)
                     db.execute(
-                        """INSERT INTO users (username) VALUES (?)""",
-                        (user_info["NAME"],),
+                        """INSERT INTO users (username, last_seen) VALUES (?,?)""",
+                        (user_info["NAME"], CURRENT_TIME),
                     )
                     database.commit()
-
+                elif "SEND_MESSAGE" in text_json:
+                    msg_info = text_json["SEND_MESSAGE"]
+                    msg_info["TO(ID)"]
                 else:
-                    print("left this part for the next thing")
+                    print("debug INFO, got into the else statement")
 
             except Exception as e:
-                print("ERROR!!!! CODE:", e)
+                print(e)
     except:
         print("SOME ERROR OCCURED")
     finally:

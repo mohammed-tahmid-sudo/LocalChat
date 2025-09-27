@@ -1,4 +1,5 @@
 import socket
+import sqlite3
 import json
 import threading
 import secrets
@@ -7,6 +8,7 @@ import string
 HOST = "127.0.0.1"
 PORT = 12345
 
+#### TESTING ####
 
 def random_password(length=16):
     chars = string.ascii_letters + string.digits + string.punctuation
@@ -21,14 +23,23 @@ def client():
 
     print("sending a dummy json")
 
-    data = {"Create_User": {"NAME": "BAKA/Dummy"}}
-
+    data = {"SEND_MESSAGE": {"NAME": random_password(5), "TO(ID)": "1"}}
 
     s.sendall(json.dumps(data).encode())
     # print(s.recv(1024).decode())
 
     s.close()
 
+
 for x in range(0, 100):
     client()
 
+#
+# conn = sqlite3.connect("/home/tahmid/LocalChat/backend/data/usernames.db")
+#
+# cur = conn.cursor()
+#
+# cur.execute("SELECT * FROM users")
+# print("\nAll users:")
+# for row in cur.fetchall():
+#     print(row)
