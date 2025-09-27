@@ -1,44 +1,52 @@
 import socket
-import sqlite3
 import json
 import threading
-import secrets
-import string
 
-HOST = "127.0.0.1"
+HOST = "127.0.0.1"  # server IP
 PORT = 12345
 
-#### TESTING ####
+username = input("Enter your username: ")
 
-def random_password(length=16):
-    chars = string.ascii_letters + string.digits + string.punctuation
-    return "".join(secrets.choice(chars) for _ in range(length))
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect((HOST, PORT))
 
+# Send CREATE_USER to server
+client.sendall(json.dumps({"CREATE_USER": {"NAME": username}}).encode())
 
-def client():
-    password1 = random_password()
-    password2 = random_password()
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((HOST, PORT))
+# Thread to receive messages
+def receive_messages():
+    while True:
+        try:
+            data = client.recv(4096)
+            if not data:
+                break
+            print(data.decode())
+        except:
+            break
 
-    print("sending a dummy json")
+threading.Thread(target=receive_messages, daemon=True).start()
 
-    data = {"SEND_MESSAGE": {"NAME": random_password(5), "TO(ID)": "1"}}
+# Main loop to send messages
+while True:
+    try:
+        msg = input()
+        if msg.lower() == "/quit":
+            break
 
-    s.sendall(json.dumps(data).encode())
-    # print(s.recv(1024).decode())
+        # Example: send to a specific user by ID
+        receiver_id = input("Send to user ID: ")
 
-    s.close()
+        send_data = {
+            "SEND_MESSAGE": {
+                "sender_id": username,  # you can use DB ID if needed
+                "reciver_id": int(receiver_id),
+                "text": msg
+            }
+        }
+        client.sendall(json.dumps(send_data).encode())
 
+    except KeyboardInterrupt:
+        break
 
-client()
+client.close()
 
-#
-# conn = sqlite3.connect("/home/tahmid/LocalChat/backend/data/usernames.db")
-#
-# cur = conn.cursor()
-#
-# cur.execute("SELECT * FROM users")
-# print("\nAll users:")
-# for row in cur.fetchall():
-#     print(row)
