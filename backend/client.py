@@ -31,8 +31,7 @@ def client():
     s.close()
 
 
-for x in range(0, 100):
-    client()
+client()
 
 #
 # conn = sqlite3.connect("/home/tahmid/LocalChat/backend/data/usernames.db")

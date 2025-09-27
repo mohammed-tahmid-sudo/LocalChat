@@ -1,5 +1,4 @@
 import socket
-import datetime
 import json
 import sqlite3
 import threading
@@ -8,7 +7,7 @@ import time
 HOST = "0.0.0.0"
 PORT = 12345
 
-CURRENT_TIME = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+CURRENT_TIME = int(time.time())
 
 users = sqlite3.connect("/home/tahmid/LocalChat/backend/data/usernames.db")
 ucur = users.cursor()
@@ -61,7 +60,12 @@ def handle_client(conn, addr):
                     database.commit()
                 elif "SEND_MESSAGE" in text_json:
                     msg_info = text_json["SEND_MESSAGE"]
-                    msg_info["TO(ID)"]
+                    msg_id = msg_info["TO(ID)"]
+                    print(msg_id)
+                    db.execute("SELECT * FROM users WHERE id = ?", (msg_id,))
+                    id = db.fetchone()
+                    print(id)
+
                 else:
                     print("debug INFO, got into the else statement")
 
