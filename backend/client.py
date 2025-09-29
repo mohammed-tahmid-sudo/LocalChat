@@ -2,7 +2,14 @@ import socket
 import threading
 import time
 
+
 def send_ping(sock):
+
+    # ping_message = {
+    #     "username": "Tahmid",
+    #     "ping": True,
+    # }
+
     while True:
         try:
             sock.sendall(b"PING")
@@ -10,9 +17,13 @@ def send_ping(sock):
             break
         time.sleep(5)
 
+
 def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect(("127.0.0.1", 12345))
+
+
+
 
     # Start ping thread
     threading.Thread(target=send_ping, args=(sock,), daemon=True).start()
@@ -36,6 +47,6 @@ def main():
 
     sock.close()
 
+
 if __name__ == "__main__":
     main()
-
