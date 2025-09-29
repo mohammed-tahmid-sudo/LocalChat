@@ -1,4 +1,5 @@
 import socket
+import time
 import json
 import sqlite3
 import threading
@@ -68,7 +69,7 @@ def handle_client(conn, addr):
                     SET lastseen = ?,
                     WHERE id = ?
 
-                """, (msg["ping"]["id"]))
+                """, (time.time() ,msg["ping"]["id"]))
             
 
             else:
