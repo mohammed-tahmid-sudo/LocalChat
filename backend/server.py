@@ -1,5 +1,9 @@
 import socket
+import sqlite3
 import threading
+
+def initialize():
+
 
 def handle_client(conn, addr):
     print(f"Connected by {addr}")
