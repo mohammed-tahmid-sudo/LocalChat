@@ -4,7 +4,7 @@ import time
 import json
 import os
 
-
+##############################################################################################################
 def send_ping(sock, user_id):
     while True:
         try:
@@ -16,12 +16,15 @@ def send_ping(sock, user_id):
         time.sleep(5)
 
 
+##############################################################################################################
+
 def if_user_found(conn, userdata):
     t = threading.Thread(target=send_ping, args=(conn, userdata["id"]))
     t.daemon = True
     t.start()
 
 
+##############################################################################################################
 def if_user_notfound(conn, username):
     data = {"type": "create_user", "name": username}
     conn.sendall(json.dumps(data).encode())
@@ -39,6 +42,7 @@ def if_user_notfound(conn, username):
         print("Received non-JSON data:", recived_data)
         return None
 
+##############################################################################################################
 
 if __name__ == "__main__":
     conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -49,7 +53,8 @@ if __name__ == "__main__":
         with open("/home/tahmid/LocalChat/backend/userdata.json", "r") as d:
             userdata = json.load(d)
         if_user_found(conn, userdata)
-    else:
+
+    elif not os.path.exists("/home/tahmid/LocalChat/backend/userdata.json"):
         print("enter your name: ")
         inp = input()
         userdata = if_user_notfound(conn, inp)
@@ -67,3 +72,4 @@ if __name__ == "__main__":
             print("error at main recv:", e)
             break
 
+##############################################################################################################
