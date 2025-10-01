@@ -5,7 +5,9 @@ import json
 import sqlite3
 import threading
 
-######################################################################################################
+#####################################################################################################
+
+clients = {}  # keep track of connected clients
 
 
 def initialize():
@@ -30,13 +32,10 @@ def initialize():
     cursor2.execute(
         """
         CREATE TABLE IF NOT EXISTS users (
-
             sender_id TEXT,
-            reciver_id TEXT
+            reciver_id TEXT,
             message TEXT
-
         )
-
         """
     )
     conn2.commit()
@@ -44,6 +43,7 @@ def initialize():
 
 
 ######################################################################################################
+
 
 def handle_client(conn, addr):
 
@@ -55,38 +55,36 @@ def handle_client(conn, addr):
 
     print(f"Connected by {addr}")
 
-######################################################################################################
+    ######################################################################################################
     while True:
         try:
             data = conn.recv(2048)
-
-            # json_data = json.loads(data)
 
             if not data:
                 break
 
             msg = json.loads(data.decode())
-
             print(f"From {addr}: {msg}")
 
-######################################################################################################
+            ######################################################################################################
 
             if msg["type"] == "create_user":
 
                 cursor.execute(
                     """
                     INSERT INTO users (name, lastseen) VALUES (?, ?)
-
                 """,
                     (msg["name"], time.time()),
                 )
                 db.commit()
 
-                data = {"type": "user_id", "id": cursor.lastrowid}
+                user_id = cursor.lastrowid
+                clients[user_id] = conn  # store this client
 
+                data = {"type": "user_id", "id": user_id}
                 conn.sendall(json.dumps(data).encode())
 
-######################################################################################################
+            ######################################################################################################
 
             elif msg["type"] == "ping":
 
@@ -95,52 +93,84 @@ def handle_client(conn, addr):
                     UPDATE users 
                     SET lastseen = ?
                     WHERE id = ?
-
                 """,
                     (time.time(), msg["id"]),
                 )
                 db.commit()
 
-######################################################################################################
+                clients[msg["id"]] = conn
+
+            ######################################################################################################
 
             elif msg["type"] == "message":
                 sender_id = msg["sender"]
-                reciver_id =  msg["reciver"]
+                reciver_id = msg["reciver"]
                 message = msg["message"]
 
-                cursor.execute(""" 
+                cursor.execute(
+                    """ 
                    SELECT lastseen FROM users WHERE id = ?
-                """, (reciver_id))
+                """,
+                    (reciver_id,),
+                )
                 reciver_lastseen = cursor.fetchone()
 
-                if reciver_lastseen + 5 < time.time():
-                    
-                    holder_cursor.execute("""
-                        
-                        INSERT   
+                if reciver_lastseen and reciver_lastseen[0] + 5 < time.time():
 
+                    holder_cursor.execute(
+                        """
+                        INSERT INTO users (sender_id, reciver_id, message) VALUES (?, ?, ?)
+                    """,
+                        (sender_id, reciver_id, message),
+                    )
+                    holder_db.commit()
+                else:
+                    # forward directly if recipient is online
+                    if reciver_id in clients:
+                        clients[reciver_id].sendall(
+                            json.dumps(
+                                {
+                                    "type": "message",
+                                    "sender": sender_id,
+                                    "message": message,
+                                }
+                            ).encode()
+                        )
+                    else:
+                        # fallback: store if not connected
+                        holder_cursor.execute(
+                            """
+                            INSERT INTO users (sender_id, reciver_id, message) VALUES (?, ?, ?)
+                        """,
+                            (sender_id, reciver_id, message),
+                        )
+                        holder_db.commit()
 
-                    """)
-
-
-
-
-######################################################################################################
+            ######################################################################################################
 
             else:
                 conn.sendall(b"ACK: " + data)
 
-######################################################################################################
+        ######################################################################################################
 
         except Exception as e:
             print(e)
+            break
 
     db.close()
     holder_db.close()
+
+    # remove from clients dict on disconnect
+    for uid, c in list(clients.items()):
+        if c == conn:
+            del clients[uid]
+            break
+
     print(f"Disconnected {addr}")
 
 
 ######################################################################################################
+
 
 def main():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -160,4 +190,4 @@ if __name__ == "__main__":
     initialize()
     main()
 
-######################################################################################################
+#####################################################################################################
