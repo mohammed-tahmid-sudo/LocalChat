@@ -50,6 +50,9 @@ def handle_client(conn, addr):
     db = sqlite3.connect("/home/tahmid/LocalChat/backend/data/users.db")
     cursor = db.cursor()
 
+    holder_db = sqlite3.connect("/home/tahmid/LocalChat/backend/data/holder.db")
+    holder_cursor = holder_db.cursor()
+
     print(f"Connected by {addr}")
 
 ######################################################################################################
@@ -99,9 +102,29 @@ def handle_client(conn, addr):
                 db.commit()
 
 ######################################################################################################
+
             elif msg["type"] == "message":
-                print("left this for the next data at 2025-10-01")
-                pass
+                sender_id = msg["sender"]
+                reciver_id =  msg["reciver"]
+                message = msg["message"]
+
+                cursor.execute(""" 
+                   SELECT lastseen FROM users WHERE id = ?
+                """, (reciver_id))
+                reciver_lastseen = cursor.fetchone()
+
+                if reciver_lastseen + 5 < time.time():
+                    
+                    holder_cursor.execute("""
+                        
+                        INSERT   
+
+
+                    """)
+
+
+
+
 ######################################################################################################
 
             else:
@@ -112,7 +135,8 @@ def handle_client(conn, addr):
         except Exception as e:
             print(e)
 
-    db.close
+    db.close()
+    holder_db.close()
     print(f"Disconnected {addr}")
 
 

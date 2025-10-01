@@ -54,7 +54,8 @@ if __name__ == "__main__":
             userdata = json.load(d)
         if_user_found(conn, userdata)
 
-    elif not os.path.exists("/home/tahmid/LocalChat/backend/userdata.json"):
+    # elif not os.path.exists("/home/tahmid/LocalChat/backend/userdata.json"):
+    else:
         print("enter your name: ")
         inp = input()
         userdata = if_user_notfound(conn, inp)
