@@ -18,27 +18,6 @@ def send_ping(sock, user_id):
         time.sleep(5)
 
 
-##############################################################################################################
-
-# def message(conn, userdata):
-#     # keep receiving messages
-#     while True:
-#         try:
-#             msg = conn.recv(1024).decode()
-#             if not msg:
-#                 break
-#             print("Received:", msg)
-#             sent = input("ENTER YOUT messages")
-#             to = int(input("TO WHO?: "))
-#
-#             data = {"type": "message", "sender": userdata, "reciver": to, "message": sent}
-#
-#             conn.sendall(json.dumps(data).encode())
-#
-#         except Exception as e:
-#             print("error at main recv:", e)
-#             break
-
 
 def message(conn, userdata):
     def recv_thread():

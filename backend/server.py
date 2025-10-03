@@ -115,7 +115,10 @@ def handle_client(conn, addr):
                 )
                 reciver_lastseen = cursor.fetchone()
 
-                if reciver_lastseen and reciver_lastseen[0] + 5 < time.time():
+                if (
+                    reciver_lastseen
+                    and int(float(reciver_lastseen[0])) + 5 < time.time()
+                ):
 
                     holder_cursor.execute(
                         """
