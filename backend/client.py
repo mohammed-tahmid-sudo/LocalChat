@@ -82,7 +82,7 @@ def if_user_notfound(conn, username):
 
     try:
         parsed = json.loads(recived_data)
-        with open("/home/tahmid/LocalChat/backend/userdata.json", "w") as f:
+        with open("userdata.json", "w") as f:
             json.dump(parsed, f, indent=4)
         print("data Created")
         return parsed
@@ -98,14 +98,14 @@ if __name__ == "__main__":
     conn.connect(("127.0.0.1", 12345))
 
     userdata = None
-    if os.path.exists("/home/tahmid/LocalChat/backend/userdata.json"):
-        with open("/home/tahmid/LocalChat/backend/userdata.json", "r") as d:
+    if os.path.exists("userdata.json"):
+        with open("userdata.json", "r") as d:
             userdata = json.load(d)
         if userdata:
             if_user_found(conn, userdata)
             message(conn, userdata)
 
-    # elif not os.path.exists("/home/tahmid/LocalChat/backend/userdata.json"):
+    # elif not os.path.exists("/userdata.json"):
     else:
         print("enter your name: ")
         inp = input()
