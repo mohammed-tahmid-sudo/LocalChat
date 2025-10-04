@@ -91,7 +91,7 @@ if __name__ == "__main__":
         userdata = if_user_notfound(conn, inp)
         if userdata:
             if_user_found(conn, userdata)
-            message(conn, inp)
+            message(conn, userdata)
 
     # # keep receiving messages
     # while True:
