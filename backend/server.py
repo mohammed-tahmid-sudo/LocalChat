@@ -7,6 +7,31 @@ import threading
 
 #####################################################################################################
 
+
+class Colors:
+    BLACK = "\033[30m"
+    RED = "\033[31m"
+    GREEN = "\033[32m"
+    YELLOW = "\033[33m"
+    BLUE = "\033[34m"
+    MAGENTA = "\033[35m"
+    CYAN = "\033[36m"
+    WHITE = "\033[37m"
+
+    BRIGHT_BLACK = "\033[90m"
+    BRIGHT_RED = "\033[91m"
+    BRIGHT_GREEN = "\033[92m"
+    BRIGHT_YELLOW = "\033[93m"
+    BRIGHT_BLUE = "\033[94m"
+    BRIGHT_MAGENTA = "\033[95m"
+    BRIGHT_CYAN = "\033[96m"
+    BRIGHT_WHITE = "\033[97m"
+
+    RESET = "\033[0m"
+
+
+#####################################################################################################
+
 clients = {}  # keep track of connected clients
 
 
@@ -110,17 +135,32 @@ def handle_client(conn, addr):
 
             if messages:
 
-                print("[DEBUG] FOUND SOME PENDING MESSAGES ON THE DATABASE")
+                print(
+                    f"[{Colors.GREEN}DEBUG{Colors.RESET}] FOUND SOME PENDING MESSAGES ON THE DATABASE"
+                )
 
-                for msg in messages:
-                    print(f"[DEBUG] SENDING{len(messages)} MESSAGE")
+                for pending in messages:
+                    print(
+                        f"[{Colors.GREEN}DEBUG{Colors.RESET}] SENDING{len(messages)} MESSAGE"
+                    )
 
                     data = {
                         "type": "message",
-                        "from": msg[0],
-                        "message": msg[1],
+                        "from": pending[0],
+                        "message": pending[1],
                     }
                     clients[msg["id"]].sendall(json.dumps(data).encode())
+                print(
+                    f"[{Colors.GREEN}DEBUG{Colors.RESET}] Message Sending FInished Now deleting the holders from the database"
+                )
+
+                holder_cursor.execute(
+                    "DELETE FROM users WHERE reciver_id = ?", (msg["id"],)
+                )
+
+                holder_db.commit()
+
+                print(f"[{Colors.GREEN}DEBUG{Colors.RESET}] REMOVDE THE EXESS DATA ")
 
         ######################################################################################################
 
@@ -128,6 +168,10 @@ def handle_client(conn, addr):
             sender_id = msg["sender"]
             reciver_id = msg["reciver"]
             message = msg["message"]
+
+            print(
+                f"[{Colors.GREEN}DEBUG{Colors.RESET}] Got a new message form ID:{sender_id} TO ID:{reciver_id} message: {message}"
+            )
 
             if reciver_id in clients:
 
@@ -139,33 +183,28 @@ def handle_client(conn, addr):
                 )
                 messages = holder_cursor.fetchall()
 
-                if messages:
+                data = {
+                    "type": "message",
+                    "from": sender_id,
+                    "message": message,
+                }
 
-                    print("[DEBUG] FOUND SOME PENDING MESSAGES ON THE DATABASE")
-                    messages.append((sender_id, message))
+                clients[reciver_id].sendall(json.dumps(data).encode())
 
-                    for msg in messages:
-                        print(f"[DEBUG] SENDING{len(message)} MESSAGE")
+            else:
+                holder_cursor.execute(
+                    "INSERT INTO users (sender_id, reciver_id, message) VALUES (?, ?, ?)",
+                    (sender_id, reciver_id, message),
+                )
+                holder_db.commit()
+        elif msg["type"] == "contact":
+            cursor.execute("SELECT name FROM users")
+            usernames = cursor.fetchall()
+            data = {"type": "usernames", "usernames": []}
 
-                        data = {
-                            "type": "message",
-                            "from": msg[0],
-                            "message": msg[1],
-                        }
-                        clients[reciver_id].sendall(json.dumps(data).encode())
+            data['usernames'] = [name[0] for name in usernames]            
 
-                else:
-                    print("[DEBUG] IF THERE IS ANY ERROR THEN YOU'RE FUCKED")
-
-                    data = {
-                        "type": "message",
-                        "from": sender_id,
-                        "message": message,
-                    }
-
-                    clients[reciver_id].sendall(json.dumps(data).encode())
-
-            # if reciver_lastseen < time.time() - 5:
+            conn.sendall(json.dumps(data).encode())
 
         else:
             conn.sendall(b"ACK: " + data)
@@ -196,7 +235,8 @@ def main():
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind(("0.0.0.0", 12345))
     server.listen()
-    print("Server listening on 0.0.0.0:12345")
+
+    print(f"[{Colors.RED}RUNNING{Colors.RESET}] Server listening on 0.0.0.0:12345")
 
     while True:
         conn, addr = server.accept()

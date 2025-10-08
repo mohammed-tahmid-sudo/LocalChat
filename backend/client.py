@@ -33,9 +33,13 @@ def message(conn, userdata):
     threading.Thread(target=recv_thread, daemon=True).start()
 
     while True:
-        sent = input("ENTER YOUR MESSAGE: ")
-        to = int(input("TO WHO?: "))
-        data = {"type": "message", "sender": userdata["id"], "reciver": to, "message": sent}
+        sent = input("ENTER YOUR MESSAGE or type @lu (list user) to list the name of the users: ")
+        
+        if sent.lower() == "@lu": 
+            data = {"type": "contact"}
+        else:
+            to = int(input("TO WHO?: "))
+            data = {"type": "message", "sender": userdata["id"], "reciver": to, "message": sent}
         try:
             conn.sendall(json.dumps(data).encode())
         except Exception as e:
