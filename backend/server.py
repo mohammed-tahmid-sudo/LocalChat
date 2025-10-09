@@ -197,13 +197,23 @@ def handle_client(conn, addr):
                     (sender_id, reciver_id, message),
                 )
                 holder_db.commit()
+        # elif msg["type"] == "contact":
+        #     cursor.execute("SELECT name FROM users")
+        #     usernames = cursor.fetchall()
+        #     data = {"type": "usernames", "usernames": []}
+        #
+        #     # data['usernames'] = [name[0] for name in usernames]
+        #     for name in usernames:
+        #         print(f"[{Colors.RED} + INFO {Colors.RESET}] {name}")
+        #         data['usernames'].append(name[0])
+        #
+        #     conn.sendall(json.dumps(data).encode())
         elif msg["type"] == "contact":
             cursor.execute("SELECT name FROM users")
-            usernames = cursor.fetchall()
-            data = {"type": "usernames", "usernames": []}
+            rows = cursor.fetchall()
+            print(f"[{Colors.GREEN}DEBUG{Colors.RESET}] fetched rows: {rows!r}")
 
-            data['usernames'] = [name[0] for name in usernames]            
-
+            data = {"type": "usernames", "usernames": [r[0] for r in rows]}
             conn.sendall(json.dumps(data).encode())
 
         else:
