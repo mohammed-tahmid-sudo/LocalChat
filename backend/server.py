@@ -8,8 +8,7 @@ import threading
 #####################################################################################################
 
 
-class Colors:
-    BLACK = "\033[30m"
+class Colors: BLACK = "\033[30m"
     RED = "\033[31m"
     GREEN = "\033[32m"
     YELLOW = "\033[33m"
@@ -197,24 +196,19 @@ def handle_client(conn, addr):
                     (sender_id, reciver_id, message),
                 )
                 holder_db.commit()
-        # elif msg["type"] == "contact":
-        #     cursor.execute("SELECT name FROM users")
-        #     usernames = cursor.fetchall()
-        #     data = {"type": "usernames", "usernames": []}
-        #
-        #     # data['usernames'] = [name[0] for name in usernames]
-        #     for name in usernames:
-        #         print(f"[{Colors.RED} + INFO {Colors.RESET}] {name}")
-        #         data['usernames'].append(name[0])
-        #
-        #     conn.sendall(json.dumps(data).encode())
-        elif msg["type"] == "contact":
-            cursor.execute("SELECT name FROM users")
-            rows = cursor.fetchall()
-            print(f"[{Colors.GREEN}DEBUG{Colors.RESET}] fetched rows: {rows!r}")
 
-            data = {"type": "usernames", "usernames": [r[0] for r in rows]}
+        elif msg["type"] == "contact":
+            
+            cursor.execute("SELECT name, id FROM users")
+            usernames = cursor.fetchall()
+            data = {"type": "usernames", "usernames": []}
+
+            data['usernames'] = [name for name in usernames]
+
+            print(f"[{Colors.GREEN}INFO{Colors.RESET}] {usernames}")
+
             conn.sendall(json.dumps(data).encode())
+    
 
         else:
             conn.sendall(b"ACK: " + data)

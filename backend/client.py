@@ -33,7 +33,10 @@ def message(conn, userdata):
     threading.Thread(target=recv_thread, daemon=True).start()
 
     while True:
-        sent = input("ENTER YOUR MESSAGE or type @lu (list user) to list the name of the users: ")
+
+        print("type ") 
+        sent = input("TYPE: ")
+
         
         if sent.lower() == "@lu": 
             data = {"type": "contact"}
@@ -97,24 +100,6 @@ if __name__ == "__main__":
             if_user_found(conn, userdata)
             message(conn, userdata)
 
-    # # keep receiving messages
-    # while True:
-    #     try:
-    #         msg = conn.recv(1024).decode()
-    #         if not msg:
-    #             break
-    #         print("Received:", msg)
-    #         sent = input("ENTER YOUT messages")
-    #         to = input("TO WHO?: ")
-    #
-    #         data = {"type": "message", "sender": userdata, "reciver": to}
-    #
-    #         conn.sendall(json.dumps(data).encode())
-    #
-    #     except Exception as e:
-    #         print("error at main recv:", e)
-    #         break
-    #
 ##############################################################################################################
 
 
