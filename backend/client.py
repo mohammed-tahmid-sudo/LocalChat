@@ -7,6 +7,7 @@ import os
 
 ##############################################################################################################
 
+
 def send_ping(sock, user_id):
     while True:
         try:
@@ -16,7 +17,6 @@ def send_ping(sock, user_id):
             print("error at line 21:", e)
             break
         time.sleep(5)
-
 
 
 def message(conn, userdata):
@@ -30,24 +30,45 @@ def message(conn, userdata):
             except:
                 break
 
+    # threading.Thread(target=recv_thread, daemon=True).start()
+
+
+    data = {"type": "contact"}
+    conn.sendall(json.dumps(data).encode())
+    message = conn.recv_thread(2048).decode()
+
+    for msg in message:
+        print(msg)
+
+    print("Select a number which corrosponds to the user")
+    id = input("-> ")
+
+    if id
+
     threading.Thread(target=recv_thread, daemon=True).start()
 
-    while True:
+    # to = None
+    # while True:
+    #     if to is None:
+    #         print("this is a list of users and type the number shoing that message that person")
+    #
+    #         to = input("type the number:  ")
+    #
+    #     print("TYPE @lu to list all the users")
+    #     sent = input("TYPE: ")
+    #
+    #
+    #     if sent.lower() == "@lu":
+    #         data = {"type": "contact"}
+    #     elif to is not None:
+    #         to = int(input("TO WHO?: "))
+    #         data = {"type": "message", "sender": userdata["id"], "reciver": to, "message": sent}
+    #     try:
+    #         conn.sendall(json.dumps(data).encode())
+    #     except Exception as e:
+    #         print("Error sending message:", e)
+    #         break
 
-        print("type ") 
-        sent = input("TYPE: ")
-
-        
-        if sent.lower() == "@lu": 
-            data = {"type": "contact"}
-        else:
-            to = int(input("TO WHO?: "))
-            data = {"type": "message", "sender": userdata["id"], "reciver": to, "message": sent}
-        try:
-            conn.sendall(json.dumps(data).encode())
-        except Exception as e:
-            print("Error sending message:", e)
-            break
 
 ##############################################################################################################
 
@@ -101,10 +122,3 @@ if __name__ == "__main__":
             message(conn, userdata)
 
 ##############################################################################################################
-
-
-
-
-
-
-
