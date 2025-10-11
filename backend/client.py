@@ -20,6 +20,7 @@ def send_ping(sock, user_id):
 
 
 def message(conn, userdata):
+
     def recv_thread():
         while True:
             try:
@@ -30,22 +31,32 @@ def message(conn, userdata):
             except:
                 break
 
-    # threading.Thread(target=recv_thread, daemon=True).start()
-
+    threading.Thread(target=recv_thread, daemon=True).start()
 
     data = {"type": "contact"}
     conn.sendall(json.dumps(data).encode())
-    message = conn.recv_thread(2048).decode()
+    message = conn.recv(2048).decode()
 
-    for msg in message:
-        print(msg)
+    print(message)
 
     print("Select a number which corrosponds to the user")
     id = input("-> ")
 
-    if id
+    if id:
+        while True:
+            inp = input("enter your input or type @lu to do that thing right: ")
 
-    threading.Thread(target=recv_thread, daemon=True).start()
+            if inp:
+                data = {
+                    "type": "message",
+                    "sender": userdata["id"],
+                    "reciver": id,
+                    "message": inp,
+                }
+
+                conn.sendall(json.dumps(data).encode())
+
+    # threading.Thread(target=recv_thread, daemon=True).start()
 
     # to = None
     # while True:

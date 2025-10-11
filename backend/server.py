@@ -199,17 +199,16 @@ def handle_client(conn, addr):
                 holder_db.commit()
 
         elif msg["type"] == "contact":
-            
+
             cursor.execute("SELECT name, id FROM users")
             usernames = cursor.fetchall()
             data = {"type": "usernames", "usernames": []}
 
-            data['usernames'] = [name for name in usernames]
+            data["usernames"] = [name for name in usernames]
 
             print(f"[{Colors.GREEN}INFO{Colors.RESET}] {usernames}")
 
             conn.sendall(json.dumps(data).encode())
-    
 
         else:
             conn.sendall(b"ACK: " + data)
