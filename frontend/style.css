@@ -1,38 +1,9 @@
-:root {
-  --sidebar-width: 240px;
+.item-box {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px;
 }
-html,
-body {
-  height: 100%;
-  margin: 0;
-}
-.container {
-  height: 100vh;
-  display: flex;
-  user-select: none; /* while dragging */
-  overflow: hidden;
-}
-.sidebar {
-  width: var(--sidebar-width);
-  min-width: 120px;
-  max-width: 600px;
-  background: #222;
-  color: #fff;
-  padding: 16px;
-  box-sizing: border-box;
-}
-.resizer {
-  width: 8px;
-  cursor: col-resize;
-  background: linear-gradient(180deg, #0000, #0002);
-  position: relative;
-}
-.resizer:active {
-  background: linear-gradient(180deg, #0003, #0006);
-}
-.content {
-  flex: 1;
-  padding: 16px;
-  background: #f4f4f4;
-  overflow: auto;
+.item-box img {
+  width: 100px;
+  display: block;
 }
