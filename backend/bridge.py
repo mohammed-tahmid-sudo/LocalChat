@@ -1,5 +1,12 @@
 import asyncio
+import socket
 import websockets
+
+conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+conn.connect(("127.0.0.1", 12345))
+
+def proceed_data(data)
+
 
 async def process_task(data):
     # simulate long-running task
