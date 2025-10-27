@@ -4,7 +4,9 @@ import time
 import json
 import sqlite3
 import threading
+from concurrent.futures import ThreadPoolExecutor
 
+# MAX_THREADS = 10  # maximum concurrent clients
 #####################################################################################################
 
 
@@ -245,6 +247,20 @@ def main():
     while True:
         conn, addr = server.accept()
         threading.Thread(target=handle_client, args=(conn, addr), daemon=True).start()
+
+
+# def main():
+#     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+#     server.bind(("0.0.0.0", 12345))
+#     server.listen()
+#
+#     print(f"[{Colors.RED}RUNNING{Colors.RESET}] Server listening on 0.0.0.0:12345")
+#
+#     with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
+#         while True:
+#             conn, addr = server.accept()
+#             executor.submit(handle_client, conn, addr)
 
 
 ######################################################################################################
