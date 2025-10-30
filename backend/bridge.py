@@ -19,6 +19,7 @@ async def handle_ws(websocket):
         while True:
             try:
                 data = await loop.sock_recv(tcp_sock, 4096)
+                print(f"DATA RECOVERED:  {data}")
                 if not data:
                     break
                 await websocket.send(data.decode())

@@ -1,10 +1,9 @@
-#:#################################################################################################
+##################################################################################################
 import socket
 import time
 import json
 import sqlite3
 import threading
-from concurrent.futures import ThreadPoolExecutor
 
 # MAX_THREADS = 10  # maximum concurrent clients
 #####################################################################################################
@@ -90,7 +89,14 @@ def handle_client(conn, addr):
         if not data:
             break
 
-        msg = json.loads(data.decode())
+
+        # msg = json.loads(data.decode())
+        try:
+            msg = json.loads(data.decode())
+        except json.JSONDecodeError:
+            print(f"[{Colors.RED}ERROR{Colors.RESET}] Invalid JSON from {addr}: {data}")
+            continue
+
         print(f"From {addr}: {msg}")
 
         ######################################################################################################
