@@ -1,106 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LocalChat</title>
-<style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; margin:0; padding:0; }
-    #login, #chat { max-width: 400px; margin: 50px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    #contacts { margin-bottom: 10px; }
-    #messages { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; margin-bottom: 10px; background:#fafafa; }
-    #messages div { margin-bottom: 5px; }
-    .sender { color: blue; }
-    .receiver { color: green; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalChat</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+    <script src="script.js"></script>
+    <div class="sidebar">
+        <div class="search">
+            <input type="text" placeholder="Search Users">
+        </div>
 
-<div id="login">
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Enter your name">
-    <button id="loginBtn">Login</button>
-</div>
+        <div class="users">
+            <img src="user.png" alt="">
+            <div class="info">
+                <h3>Tahmid</h3>
+                <p>Last Message</p>
+            </div>
+        </div>
+    </div>
 
-<div id="chat" style="display:none;">
-    <h2>LocalChat</h2>
-    <div id="contacts"></div>
-    <div id="messages"></div>
-    <input type="text" id="msgInput" placeholder="Type a message">
-    <button id="sendBtn">Send</button>
-</div>
+    <div class="main-chat">
+        <div class="message-bar">
+            <textarea placeholder="Type a message..."></textarea>
+            <button>Send</button>
+        </div>
 
-<script>
-let ws;
-let userId;
-let selectedContactId;
 
-const loginDiv = document.getElementById("login");
-const chatDiv = document.getElementById("chat");
-const contactsDiv = document.getElementById("contacts");
-const messagesDiv = document.getElementById("messages");
-const usernameInput = document.getElementById("username");
-const msgInput = document.getElementById("msgInput");
-
-document.getElementById("loginBtn").onclick = () => {
-    const name = usernameInput.value.trim();
-    if(!name) return alert("Enter a name");
-
-    ws = new WebSocket("ws://127.0.0.1:8080");
-    ws.onopen = () => {
-        ws.send(JSON.stringify({type: "create_user", name}));
-    }
-
-    ws.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        if(msg.type === "user_id") {
-            userId = msg.id;
-            loginDiv.style.display = "none";
-            chatDiv.style.display = "block";
-            getContacts();
-            setInterval(sendPing, 5000); // keep connection alive
-        }
-        if(msg.type === "usernames") {
-            contactsDiv.innerHTML = "";
-            msg.usernames.forEach(u => {
-                if(u[1] === userId) return;
-                const btn = document.createElement("button");
-                btn.textContent = u[0];
-                btn.onclick = () => selectedContactId = u[1];
-                contactsDiv.appendChild(btn);
-            });
-        }
-        if(msg.type === "message") {
-            const div = document.createElement("div");
-            div.className = msg.from === userId ? "sender" : "receiver";
-            div.textContent = `${msg.from}: ${msg.message}`;
-            messagesDiv.appendChild(div);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-    }
-}
-
-document.getElementById("sendBtn").onclick = () => {
-    const message = msgInput.value.trim();
-    if(!message || !selectedContactId) return alert("Select contact and type message");
-
-    ws.send(JSON.stringify({
-        type: "message",
-        sender: userId,
-        reciver: selectedContactId,
-        message
-    }));
-    msgInput.value = "";
-}
-
-function getContacts() {
-    ws.send(JSON.stringify({type: "contact"}));
-}
-
-function sendPing() {
-    ws.send(JSON.stringify({type: "ping", id: userId}));
-}
-</script>
+    </div>
 
 </body>
+
 </html>
