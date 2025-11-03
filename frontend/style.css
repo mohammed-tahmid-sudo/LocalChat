@@ -74,6 +74,18 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  padding: 20px;
+  padding-bottom: 80px;
+  overflow-y: auto;
+}
+
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    margin-bottom: 60px;
 }
 
 .message-bar {
@@ -115,4 +127,28 @@ body {
   outline: none;
   font-size: 16px;
   background: #323c45; ;
+}
+
+.message {
+    max-width: 70%;
+    padding: 10px 15px;
+    margin: 5px 10px;
+    border-radius: 15px;
+    word-wrap: break-word;
+}
+
+.sent {
+    background-color: #dcf8c6;
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+.received {
+    background-color: white;
+    align-self: flex-start;
+    margin-right: auto;
+}
+
+.users.active {
+    background-color: #2a3942;
 }

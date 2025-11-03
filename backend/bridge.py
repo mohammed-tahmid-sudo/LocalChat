@@ -12,28 +12,35 @@ WS_PORT = 8080
 async def handle_ws(websocket):
     loop = asyncio.get_running_loop()
     tcp_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    tcp_sock.connect((TCP_HOST, TCP_PORT))
-    tcp_sock.setblocking(False)
+    
+    try:
+        tcp_sock.connect((TCP_HOST, TCP_PORT))
+        tcp_sock.setblocking(False)
 
-    async def tcp_to_ws():
-        while True:
-            try:
-                data = await loop.sock_recv(tcp_sock, 4096)
-                print(f"DATA RECOVERED:  {data}")
-                if not data:
+        async def tcp_to_ws():
+            while True:
+                try:
+                    data = await loop.sock_recv(tcp_sock, 4096)
+                    if not data:
+                        break
+                    await websocket.send(data.decode())
+                except Exception as e:
+                    print(f"TCP to WS error: {e}")
                     break
-                await websocket.send(data.decode())
-            except:
-                break
 
-    async def ws_to_tcp():
-        async for msg in websocket:
-            await loop.sock_sendall(tcp_sock, msg.encode())
+        async def ws_to_tcp():
+            try:
+                async for msg in websocket:
+                    await loop.sock_sendall(tcp_sock, msg.encode())
+            except Exception as e:
+                print(f"WS to TCP error: {e}")
 
-    # Run both directions concurrently
-    await asyncio.gather(tcp_to_ws(), ws_to_tcp())
+        await asyncio.gather(tcp_to_ws(), ws_to_tcp())
 
-    tcp_sock.close()
+    except Exception as e:
+        print(f"Connection error: {e}")
+    finally:
+        tcp_sock.close()
 
 
 async def main():
