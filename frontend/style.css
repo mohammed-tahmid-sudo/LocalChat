@@ -68,7 +68,6 @@ body {
 
 .main-chat {
   flex: 1;
-  height: 100vh;
   background: #f0f0f0;
   position: relative;
   display: flex;
